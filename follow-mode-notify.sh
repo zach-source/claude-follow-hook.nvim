@@ -66,7 +66,7 @@ if [[ -z "$FILE_PATH" || "$FILE_PATH" == "null" ]]; then
 fi
 
 # Clean up temp file when done
-trap "rm -f '$TEMP_JSON'" EXIT
+trap 'rm -f "$TEMP_JSON"' EXIT
 
 # Get tool name to determine operation type
 TOOL_NAME=$(jq -r '.tool_name // "unknown"' "$TEMP_JSON" 2>>"$DEBUG_LOG")
@@ -106,7 +106,7 @@ log_debug "Sending to nvim: $FILE_PATH_ESCAPED:$LINE_NUM"
 # Send to socket using nvim --remote-expr
 if command -v nvim >/dev/null 2>&1; then
 	# Use nvim --remote-expr to call the follow-mode function with highlighting info
-	if nvim --server "$SOCKET" --remote-expr "luaeval(\"require('config.follow-mode').open_file('$FILE_PATH_ESCAPED', $LINE_NUM, $LINE_COUNT, '$TOOL_NAME')\")" 2>&1 | tee -a "$DEBUG_LOG"; then
+	if nvim --server "$SOCKET" --remote-expr "luaeval(\"require('claude-follow').open_file('$FILE_PATH_ESCAPED', $LINE_NUM, $LINE_COUNT, '$TOOL_NAME')\")" 2>&1 | tee -a "$DEBUG_LOG"; then
 		log_debug "✓ Successfully sent to nvim"
 	else
 		log_debug "✗ Failed to send to nvim"

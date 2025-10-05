@@ -31,7 +31,7 @@ Perfect for pair programming with Claude or watching Claude work in another term
   config = function()
     require("claude-follow").setup({
       setup_keymaps = true,  -- Enable default keymaps
-      keymap_prefix = "<leader>cf",  -- Prefix for keymaps
+      keymap_prefix = "<leader>af",  -- Prefix for keymaps
     })
   end,
 }
@@ -54,10 +54,46 @@ use {
 
 ```lua
 require("claude-follow").setup({
+  -- Keymaps
   setup_keymaps = true,        -- Enable default keymaps (default: true)
-  keymap_prefix = "<leader>cf", -- Keymap prefix (default: "<leader>cf")
+  keymap_prefix = "<leader>af", -- Keymap prefix (default: "<leader>af")
+
+  -- Socket settings
+  socket_prefix = "/tmp/nvim-follow-", -- Socket path prefix
+  socket_hash_length = 12,     -- Length of CWD hash in socket name
+
+  -- UI customization
+  buffer_name = "[Claude Follow]", -- Name of the follow buffer
+  sign_text = "●",             -- Sign text in gutter
+  sign_texthl = "DiagnosticInfo", -- Highlight group for sign text
+  sign_linehl = "DiffAdd",     -- Highlight group for line background
+  highlight_duration = 5000,   -- Duration to show highlights (ms)
+
+  -- Scroll behavior
+  scroll_to_change = true,     -- Auto-scroll to changed lines (default: true)
+  scroll_offset = 5,           -- Lines of context above/below (default: 5)
+
+  -- Debug
+  debug_log_path = "/tmp/claude-follow-mode-debug.log", -- Path for debug logs
 })
 ```
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `setup_keymaps` | boolean | `true` | Enable default keymaps |
+| `keymap_prefix` | string | `"<leader>af"` | Prefix for all keymaps |
+| `socket_prefix` | string | `"/tmp/nvim-follow-"` | Socket file path prefix |
+| `socket_hash_length` | number | `12` | Length of CWD hash in socket name |
+| `buffer_name` | string | `"[Claude Follow]"` | Name of follow buffer |
+| `sign_text` | string | `"●"` | Character shown in gutter for changes |
+| `sign_texthl` | string | `"DiagnosticInfo"` | Highlight group for sign |
+| `sign_linehl` | string | `"DiffAdd"` | Highlight group for changed lines |
+| `highlight_duration` | number | `5000` | How long to show highlights (milliseconds) |
+| `scroll_to_change` | boolean | `true` | Auto-scroll viewport to changed lines |
+| `scroll_offset` | number | `5` | Lines of context above/below when scrolling |
+| `debug_log_path` | string | `"/tmp/claude-follow-mode-debug.log"` | Debug log file path |
 
 ### Disable Default Keymaps
 
@@ -81,10 +117,10 @@ vim.keymap.set("n", "<leader>wF", require("claude-follow").toggle)
 
 ### Default Keymaps
 
-- `<leader>cf` - Toggle follow mode
-- `<leader>cfe` - Enable follow mode
-- `<leader>cfd` - Disable follow mode
-- `<leader>cfs` - Status
+- `<leader>af` - Toggle follow mode
+- `<leader>afe` - Enable follow mode
+- `<leader>afd` - Disable follow mode
+- `<leader>afs` - Status
 
 ## Claude Code Hook Setup
 
@@ -148,6 +184,22 @@ This means:
 - Claude Code CLI installed
 - `jq` for JSON parsing in the hook script
 - Unix-like system (macOS, Linux)
+
+## Testing
+
+Run the test suite with:
+
+```bash
+make test
+```
+
+Or manually with:
+
+```bash
+nvim --headless --noplugin -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/ { minimal_init = 'tests/minimal_init.lua' }"
+```
+
+**Note**: Tests require [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) to be installed.
 
 ## Tips
 
