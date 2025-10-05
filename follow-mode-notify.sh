@@ -4,11 +4,14 @@
 
 set -euo pipefail
 
-# Debug logging (always enabled for troubleshooting)
+# Debug logging (only when enabled in neovim)
 DEBUG_LOG="/tmp/claude-follow-mode-debug.log"
 
 log_debug() {
-	echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >>"$DEBUG_LOG"
+	# Only log if debug is enabled (check via nvim global)
+	if [[ "${FOLLOW_MODE_DEBUG:-0}" == "1" ]]; then
+		echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >>"$DEBUG_LOG"
+	fi
 }
 
 # Get current working directory for socket name
@@ -28,6 +31,14 @@ if [[ ! -S "$SOCKET" ]]; then
 	# Follow mode not enabled for this workspace, exit silently
 	log_debug "Socket not found, exiting"
 	exit 0
+fi
+
+# Get debug flag from nvim if available
+if command -v nvim >/dev/null 2>&1; then
+	FOLLOW_MODE_DEBUG=$(nvim --server "$SOCKET" --remote-expr "v:lua.vim.g.follow_mode_debug" 2>/dev/null || echo "0")
+	# Convert vim true/false to 1/0
+	[[ "$FOLLOW_MODE_DEBUG" == "v:true" || "$FOLLOW_MODE_DEBUG" == "1" ]] && FOLLOW_MODE_DEBUG=1 || FOLLOW_MODE_DEBUG=0
+	export FOLLOW_MODE_DEBUG
 fi
 
 log_debug "Socket exists"

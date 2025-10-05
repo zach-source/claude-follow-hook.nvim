@@ -11,11 +11,12 @@ M.config = {
     sign_text = "●",
     sign_texthl = "DiagnosticInfo",
     sign_linehl = "DiffAdd",
-    debug_log_path = "/tmp/claude-follow-mode-debug.log",
     setup_keymaps = true,
     keymap_prefix = "<leader>af",
     scroll_to_change = true, -- Automatically scroll to changed lines
     scroll_offset = 5, -- Lines of context above/below when scrolling
+    debug = false, -- Enable debug logging
+    debug_log_path = "/tmp/claude-follow-mode-debug.log",
 }
 
 -- Generate socket path based on current working directory
@@ -89,6 +90,7 @@ M.enable = function()
         M.enabled = true
         vim.g.follow_mode_enabled = true
         vim.g.follow_mode_socket = M.socket_path
+        vim.g.follow_mode_debug = M.config.debug
 
         -- Get or create follow buffer
         local buf = M.get_or_create_follow_buffer()
@@ -129,6 +131,7 @@ M.disable = function()
     M.enabled = false
     vim.g.follow_mode_enabled = false
     vim.g.follow_mode_socket = nil
+    vim.g.follow_mode_debug = nil
 
     -- Clean up socket file if it exists
     if M.socket_path then

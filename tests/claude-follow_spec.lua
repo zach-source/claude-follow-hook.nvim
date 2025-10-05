@@ -24,11 +24,12 @@ describe("claude-follow", function()
             sign_text = "●",
             sign_texthl = "DiagnosticInfo",
             sign_linehl = "DiffAdd",
-            debug_log_path = "/tmp/claude-follow-mode-debug.log",
             setup_keymaps = true,
             keymap_prefix = "<leader>af",
             scroll_to_change = true,
             scroll_offset = 5,
+            debug = false,
+            debug_log_path = "/tmp/claude-follow-mode-debug.log",
         }
     end)
 
@@ -199,6 +200,14 @@ describe("claude-follow", function()
 
             assert.is_false(follow.config.scroll_to_change)
             assert.are.equal(10, follow.config.scroll_offset)
+        end)
+
+        it("should configure debug mode", function()
+            follow.setup({
+                debug = true,
+            })
+
+            assert.is_true(follow.config.debug)
         end)
     end)
 

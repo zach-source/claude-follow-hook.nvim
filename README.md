@@ -74,6 +74,7 @@ require("claude-follow").setup({
   scroll_offset = 5,           -- Lines of context above/below (default: 5)
 
   -- Debug
+  debug = false,               -- Enable debug logging (default: false)
   debug_log_path = "/tmp/claude-follow-mode-debug.log", -- Path for debug logs
 })
 ```
@@ -93,6 +94,7 @@ require("claude-follow").setup({
 | `highlight_duration` | number | `5000` | How long to show highlights (milliseconds) |
 | `scroll_to_change` | boolean | `true` | Auto-scroll viewport to changed lines |
 | `scroll_offset` | number | `5` | Lines of context above/below when scrolling |
+| `debug` | boolean | `false` | Enable debug logging in bash hook |
 | `debug_log_path` | string | `"/tmp/claude-follow-mode-debug.log"` | Debug log file path |
 
 ### Disable Default Keymaps
@@ -223,15 +225,19 @@ Just run `:FollowModeOff` or toggle with your keymap.
 
 ### Hook Not Working
 
-Enable debug logging:
-```bash
-export CLAUDE_FOLLOW_DEBUG=1
+Enable debug logging in your NeoVim config:
+```lua
+require("claude-follow").setup({
+  debug = true,
+})
 ```
 
 Check the log:
 ```bash
 tail -f /tmp/claude-follow-mode-debug.log
 ```
+
+Debug logs will only be written when `debug = true` is set in your config.
 
 ### Socket Not Found
 
