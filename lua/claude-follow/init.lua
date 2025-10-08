@@ -1,6 +1,8 @@
 -- Claude Code Follow Mode: Watch Claude edit files via Unix socket
+-- Version: 1.0.0
 local M = {}
 M.name = "ClaudeCodeFollowMode"
+M.version = "1.0.0"
 
 -- Default configuration
 M.config = {
@@ -157,9 +159,17 @@ end
 -- Get status
 M.status = function()
     if M.enabled then
-        vim.notify("Follow mode: ENABLED\nSocket: " .. M.socket_path, vim.log.levels.INFO)
+        local cwd = vim.fn.getcwd()
+        local msg = string.format(
+            "Follow mode: ENABLED\nVersion: %s\nCWD: %s\nSocket: %s\nDebug: %s",
+            M.version,
+            vim.fn.fnamemodify(cwd, ":~"),
+            M.socket_path,
+            M.config.debug and "ON" or "OFF"
+        )
+        vim.notify(msg, vim.log.levels.INFO)
     else
-        vim.notify("Follow mode: DISABLED", vim.log.levels.INFO)
+        vim.notify("Follow mode: DISABLED\nVersion: " .. M.version, vim.log.levels.INFO)
     end
 end
 

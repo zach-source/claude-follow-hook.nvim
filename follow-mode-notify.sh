@@ -86,17 +86,32 @@ TOOL_NAME=$(jq -r '.tool_name // "unknown"' "$TEMP_JSON" 2>>"$DEBUG_LOG")
 OLD_STRING=$(jq -r '.tool_input.old_string // .parameters.old_string // empty' "$TEMP_JSON" 2>>"$DEBUG_LOG")
 NEW_STRING=$(jq -r '.tool_input.new_string // .parameters.new_string // empty' "$TEMP_JSON" 2>>"$DEBUG_LOG")
 
-# For Edit operations, find the line number by searching for old_string in the file
+# For Edit operations, find the line number from tool output or by searching
 LINE_NUM=1
-if [[ "$TOOL_NAME" == "Edit" && -n "$OLD_STRING" && "$OLD_STRING" != "null" && -f "$FILE_PATH" ]]; then
+
+# First try to extract line number from tool_response.output (most reliable)
+TOOL_OUTPUT=$(jq -r '.tool_response.output // empty' "$TEMP_JSON" 2>/dev/null || true)
+if [[ -n "$TOOL_OUTPUT" && "$TOOL_OUTPUT" != "null" ]]; then
+	# Extract first line number from output format: "     123→content"
+	EXTRACTED_LINE=$(echo "$TOOL_OUTPUT" | grep -o '^ *[0-9]*→' | head -1 | grep -o '[0-9]*' || true)
+	if [[ -n "$EXTRACTED_LINE" ]]; then
+		LINE_NUM=$EXTRACTED_LINE
+		log_debug "Extracted line number from tool output: $LINE_NUM"
+	fi
+fi
+
+# Fallback: For Edit operations, search for old_string in the file
+if [[ "$LINE_NUM" == "1" && "$TOOL_NAME" == "Edit" && -n "$OLD_STRING" && "$OLD_STRING" != "null" && -f "$FILE_PATH" ]]; then
 	# Get first line of old_string to search
 	SEARCH_LINE=$(echo "$OLD_STRING" | head -1)
 	log_debug "Searching for line: $SEARCH_LINE"
-	# Find line number in file
-	FOUND_LINE=$(grep -n -F "$SEARCH_LINE" "$FILE_PATH" 2>/dev/null | head -1 | cut -d: -f1)
+	# Find line number in file (use || true to prevent script exit on grep failure)
+	FOUND_LINE=$(grep -n -F "$SEARCH_LINE" "$FILE_PATH" 2>/dev/null | head -1 | cut -d: -f1 || true)
 	if [[ -n "$FOUND_LINE" ]]; then
 		LINE_NUM=$FOUND_LINE
-		log_debug "Found edit at line $LINE_NUM"
+		log_debug "Found edit at line $LINE_NUM via file search"
+	else
+		log_debug "Could not find line in file, defaulting to line 1"
 	fi
 fi
 

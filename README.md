@@ -9,6 +9,8 @@ Watch Claude Code edit files in real-time from your NeoVim editor.
 - 🎨 **Visual highlights** - See exactly what Claude changed with green backgrounds and gutter markers
 - ⚡ **Auto-focus** - Files open automatically as Claude edits them
 - 🔄 **Re-enable friendly** - Toggle on/off without errors
+- 📜 **Auto-scroll** - Automatically scrolls to changed lines with configurable offset
+- 🐛 **Debug mode** - Optional logging for troubleshooting
 
 ## Demo
 
