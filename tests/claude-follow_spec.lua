@@ -8,6 +8,16 @@ describe("claude-follow", function()
             follow.disable()
         end
 
+        -- Force cleanup any lingering socket
+        if follow.socket_path and vim.fn.filereadable(follow.socket_path) == 1 then
+            vim.fn.delete(follow.socket_path)
+        end
+
+        -- Reset socket state
+        follow.socket_path = nil
+        follow.server_id = nil
+        follow.enabled = false
+
         -- Delete all buffers to avoid conflicts
         for _, buf in ipairs(vim.api.nvim_list_bufs()) do
             if vim.api.nvim_buf_is_valid(buf) then
