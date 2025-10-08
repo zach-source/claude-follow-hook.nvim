@@ -1,8 +1,8 @@
 -- Claude Code Follow Mode: Watch Claude edit files via Unix socket
--- Version: 1.0.1
+-- Version: 1.0.0
 local M = {}
 M.name = "ClaudeCodeFollowMode"
-M.version = "1.0.1"
+M.version = "1.0.0"
 
 -- Default configuration
 M.config = {
@@ -49,9 +49,9 @@ M.get_or_create_follow_buffer = function()
     -- Create new follow buffer (listed, not scratch)
     local buf = vim.api.nvim_create_buf(true, false)
     vim.api.nvim_buf_set_name(buf, M.config.buffer_name)
-    vim.api.nvim_buf_set_option(buf, "bufhidden", "hide")
-    vim.api.nvim_buf_set_option(buf, "buftype", "") -- Normal buffer (not nofile)
-    vim.api.nvim_buf_set_option(buf, "modifiable", true)
+    vim.bo[buf].bufhidden = "hide"
+    vim.bo[buf].buftype = "" -- Normal buffer (not nofile)
+    vim.bo[buf].modifiable = true
 
     -- Add helpful text
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
@@ -67,7 +67,7 @@ M.get_or_create_follow_buffer = function()
     })
 
     -- Mark as not modified (so it doesn't ask to save)
-    vim.api.nvim_buf_set_option(buf, "modified", false)
+    vim.bo[buf].modified = false
 
     return buf
 end
@@ -178,7 +178,7 @@ M.get_main_editor_window = function()
     -- Find first normal window that's not special
     for _, win in ipairs(vim.api.nvim_list_wins()) do
         local buf = vim.api.nvim_win_get_buf(win)
-        local buftype = vim.api.nvim_buf_get_option(buf, "buftype")
+        local buftype = vim.bo[buf].buftype
         local bufname = vim.api.nvim_buf_get_name(buf)
 
         -- Skip terminal and special buffers
@@ -269,8 +269,9 @@ M.open_file = function(file_path, line_num, line_count, tool_name)
     -- Restore shortmess
     vim.o.shortmess = old_shortmess
 
-    -- Ensure buffer is modifiable
-    vim.api.nvim_buf_set_option(buf, "modifiable", true)
+    -- Ensure buffer is modifiable (use vim.bo for buffer-local options)
+    vim.bo[buf].modifiable = true
+    vim.bo[buf].readonly = false
 
     -- Jump to line if provided
     if line_num and line_num > 0 then
