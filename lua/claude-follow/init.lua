@@ -1,8 +1,8 @@
 -- Claude Code Follow Mode: Watch Claude edit files via Unix socket
--- Version: 1.0.0
+-- Version: 1.0.1
 local M = {}
 M.name = "ClaudeCodeFollowMode"
-M.version = "1.0.0"
+M.version = "1.0.1"
 
 -- Default configuration
 M.config = {
